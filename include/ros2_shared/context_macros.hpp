@@ -64,4 +64,12 @@ node_ref.set_on_parameters_set_callback( \
   rcl_macro(logger, "%s = %s", #n, \
   rclcpp::to_string(rclcpp::ParameterValue{cxt_ref.n##_}).c_str());
 
+
+// Use CXT_MACRO_SET_PARAMETER to set the local and node's parameter value
+#define CXT_MACRO_SET_PARAMETER(node_ref, cxt_ref, n, d) \
+  do { \
+  cxt_ref.n##_ = d; \
+  node_ref.set_parameter(rclcpp::Parameter(#n, d)); \
+  } while (false)
+
 #endif // CONTEXT_MACROS_HPP
