@@ -40,7 +40,7 @@ if (parameter.get_name() == #n) {\
 #define CXT_MACRO_REGISTER_PARAMETERS_CHANGED(node_ref, all_params, validate_func) \
 node_ref.set_on_parameters_set_callback( \
 [this, existing_callback = node_ref.set_on_parameters_set_callback(nullptr), the_logger = node_ref.get_logger()]\
-(std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult\
+(const std::vector<rclcpp::Parameter> &parameters) -> rcl_interfaces::msg::SetParametersResult\
 {\
   auto result = rcl_interfaces::msg::SetParametersResult(); \
   if (nullptr != existing_callback) { \
