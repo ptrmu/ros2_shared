@@ -1,6 +1,10 @@
 #ifndef CONTEXT_MACROS_HPP
 #define CONTEXT_MACROS_HPP
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 // A set of macros that help define parameters in ROS2 nodes.
 //
 //  1) Define a master macro with containing the full list of parameters.
@@ -11,9 +15,18 @@
 //  5) Display the values of all parameters with the CXT_MACRO_LOG_PARAMETER macro.
 //
 
+
+// ==============================================================================
+// Define parameters
+// ==============================================================================
+
 // Define CXT_MACRO_MEMBER to CXT_MACRO_DEFINE_MEMBER before declaring members
 #define CXT_MACRO_DEFINE_MEMBER(n, t, d) t n##_{d};
 
+
+// ==============================================================================
+// Declare parameters
+// ==============================================================================
 
 // Define CXT_MACRO_MEMBER to CXT_MACRO_LOAD_PARAMETER before invoking CXT_MACRO_INIT_PARAMETERS
 #define CXT_MACRO_LOAD_PARAMETER(node_ref, cxt_ref, n, t, d) \
@@ -24,6 +37,10 @@
 all_params \
 validate_func(); \
 
+
+// ==============================================================================
+// Register for parameter changed notification (by external sources)
+// ==============================================================================
 
 // Define CXT_MACRO_MEMBER to CXT_MACRO_PARAMETER_CHANGED before invoking CXT_MACRO_REGISTER_PARAMETERS_CHANGED
 // Notice that the_logger and param_set are expected to be defined and initialized
@@ -59,11 +76,34 @@ node_ref.set_on_parameters_set_callback( \
 });
 
 
+// ==============================================================================
+// Log the current parameter values - often done at startup
+// ==============================================================================
+
 // Define CXT_MACRO_MEMBER to CXT_MACRO_LOG_PARAMETER before logging the current value of the parameters
 #define CXT_MACRO_LOG_PARAMETER(rcl_macro, logger, cxt_ref, n, t, d) \
   rcl_macro(logger, "%s = %s", #n, \
   rclcpp::to_string(rclcpp::ParameterValue{cxt_ref.n##_}).c_str());
 
+#define CXT_MACRO_LOG_SORTED_PARAMETER(cxt_ref, n, t, d)  ps.emplace_back(std::string(#n).append(" = ")\
+  .append(rclcpp::to_string(rclcpp::ParameterValue{cxt_ref.n##_}).c_str()));
+
+#define CXT_MACRO_LOG_SORTED_PARAMETERS(rcl_macro, logger, title, all_params) \
+{ \
+  std::vector<std::string> ps{}; \
+  all_params \
+  std::sort(ps.begin(), ps.end()); \
+  std::string s{title}; \
+  for (auto &p : ps) { \
+    s.append("\n").append(p); \
+  } \
+  rcl_macro(logger, s.c_str()); \
+}
+
+
+// ==============================================================================
+// Check for parameters that were on the command line but are not defined. (Often a command line mis-type)
+// ==============================================================================
 
 // Define CXT_MACRO_MEMBER to CXT_MACRO_CHECK_CMDLINE_PARAMETER and then use the
 // CXT_MACRO_CHECK_CMDLINE_PARAMETERS marco to display invalid/undefined command line parameters.
@@ -78,7 +118,6 @@ node_ref.set_on_parameters_set_callback( \
     RCLCPP_INFO(node_ref.get_logger(), "**** ERROR: Undefined command line parameter: %s", npo.first.c_str()); \
   } \
 }
-
 
 // Use CXT_MACRO_SET_PARAMETER to set the local and node's parameter value
 #define CXT_MACRO_SET_PARAMETER(node_ref, cxt_ref, n, d) \
