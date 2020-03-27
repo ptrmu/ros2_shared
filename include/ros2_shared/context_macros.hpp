@@ -65,6 +65,21 @@ node_ref.set_on_parameters_set_callback( \
   rclcpp::to_string(rclcpp::ParameterValue{cxt_ref.n##_}).c_str());
 
 
+// Define CXT_MACRO_MEMBER to CXT_MACRO_CHECK_CMDLINE_PARAMETER and then use the
+// CXT_MACRO_CHECK_CMDLINE_PARAMETERS marco to display invalid/undefined command line parameters.
+#define CXT_MACRO_CHECK_CMDLINE_PARAMETER(n, t, d) if (npo.first == #n) continue;
+
+#define CXT_MACRO_CHECK_CMDLINE_PARAMETERS(node_ref, all_params) {\
+  auto npi = get_node_parameters_interface(); \
+  auto npos = npi->get_parameter_overrides(); \
+  for (auto &npo : npos) { \
+    all_params \
+    if (npo.first == "use_sim_time") continue; \
+    RCLCPP_INFO(node_ref.get_logger(), "**** ERROR: Undefined command line parameter: %s", npo.first.c_str()); \
+  } \
+}
+
+
 // Use CXT_MACRO_SET_PARAMETER to set the local and node's parameter value
 #define CXT_MACRO_SET_PARAMETER(node_ref, cxt_ref, n, d) \
   do { \
