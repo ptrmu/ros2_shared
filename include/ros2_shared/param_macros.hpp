@@ -18,46 +18,49 @@
 //  5) Display the values of all parameters with the PAMA_PARAMS_LOG macro.
 //  6) Check that all the command line arguments are defined parameters.
 //
-// Sample code that demonstrates one way to use these macros
-//
-//    #define LOC_ALL_PARAMS \
-//      /* Aruco markers */\
-//      PAMA_PARAM(aruco_dictionary_id, int, 0)             /* Aruco dictionary id for localization markers  */ \
-//      PAMA_PARAM(cv3_do_corner_refinement, int, 1)        /* OpenCV 3.x argument to detect corners. 0 = false, 1 = true */\
-//      PAMA_PARAM(cv4_corner_refinement_method, int, 2)    /* OpenCV 4.x argument to detect corners. 0 = none, 1 = subpix, 2 = contour, 3 = apriltag */\
-//      /* End of list */
-//
-//    struct LocContext
-//    {
-//    #undef PAMA_PARAM
-//    #define PAMA_PARAM(n, t, d) PAMA_PARAM_DEFINE(n, t, d)
-//      PAMA_PARAMS_DEFINE(LOC_ALL_PARAMS)
-//    };
-//
-//    void validate_parameters()
-//    {}
-//
-//    void setup_parameters()
-//    {
-//    #undef PAMA_PARAM
-//    #define PAMA_PARAM(n, t, d) PAMA_PARAM_INIT(n, t, d)
-//      PAMA_PARAMS_INIT((*this), cxt_, "vloc.", LOC_ALL_PARAMS, validate_parameters)
-//
-//    #undef PAMA_PARAM
-//    #define PAMA_PARAM(n, t, d) PAMA_PARAM_CHANGED(n, t, d)
-//      PAMA_PARAMS_CHANGED((*this), cxt_, "vloc.", LOC_ALL_PARAMS, validate_parameters, RCLCPP_INFO)
-//
-//    #undef PAMA_PARAM
-//    #define PAMA_PARAM(n, t, d) PAMA_PARAM_LOG(n, t, d)
-//      PAMA_PARAMS_LOG((*this), cxt_, "vloc.", LOC_ALL_PARAMS, RCLCPP_INFO)
-//
-//    #undef PAMA_PARAM
-//    #define PAMA_PARAM(n, t, d) PAMA_PARAM_CHECK_CMDLINE(n, t, d)
-//      PAMA_PARAMS_CHECK_CMDLINE((*this), "vloc.", LOC_ALL_PARAMS, RCLCPP_ERROR)
-//
-//      // An example of how to set a parameter from code.
-//      PAMA_SET_PARAM((*this), cxt_, "vloc.", cv3_do_corner_refinement, 0);
-//    }
+// Sample code that demonstrates one way to use these macros.
+#if 0 // beginning of sample code
+
+#define LOC_ALL_PARAMS \
+  /* Aruco markers */\
+  PAMA_PARAM(aruco_dictionary_id, int, 0)             /* Aruco dictionary id for localization markers  */ \
+  PAMA_PARAM(cv3_do_corner_refinement, int, 1)        /* OpenCV 3.x argument to detect corners. 0 = false, 1 = true */\
+  PAMA_PARAM(cv4_corner_refinement_method, int, 2)    /* OpenCV 4.x argument to detect corners. 0 = none, 1 = subpix, 2 = contour, 3 = apriltag */\
+  /* End of list */
+
+struct LocContext
+{
+#undef PAMA_PARAM
+#define PAMA_PARAM(n, t, d) PAMA_PARAM_DEFINE(n, t, d)
+  PAMA_PARAMS_DEFINE(LOC_ALL_PARAMS)
+};
+
+void validate_parameters()
+{}
+
+void setup_parameters()
+{
+#undef PAMA_PARAM
+#define PAMA_PARAM(n, t, d) PAMA_PARAM_INIT(n, t, d)
+  PAMA_PARAMS_INIT((*this), cxt_, "vloc.", LOC_ALL_PARAMS, validate_parameters)
+
+#undef PAMA_PARAM
+#define PAMA_PARAM(n, t, d) PAMA_PARAM_CHANGED(n, t, d)
+  PAMA_PARAMS_CHANGED((*this), cxt_, "vloc.", LOC_ALL_PARAMS, validate_parameters, RCLCPP_INFO)
+
+#undef PAMA_PARAM
+#define PAMA_PARAM(n, t, d) PAMA_PARAM_LOG(n, t, d)
+  PAMA_PARAMS_LOG((*this), cxt_, "vloc.", LOC_ALL_PARAMS, RCLCPP_INFO)
+
+#undef PAMA_PARAM
+#define PAMA_PARAM(n, t, d) PAMA_PARAM_CHECK_CMDLINE(n, t, d)
+  PAMA_PARAMS_CHECK_CMDLINE((*this), "vloc.", LOC_ALL_PARAMS, RCLCPP_ERROR)
+
+  // An example of how to set a parameter from code.
+  PAMA_SET_PARAM((*this), cxt_, "vloc.", cv3_do_corner_refinement, 0);
+}
+#endif // End of sample code
+
 
 
 // ==============================================================================
