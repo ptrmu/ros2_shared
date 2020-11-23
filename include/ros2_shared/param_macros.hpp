@@ -108,7 +108,7 @@ if (parameter.get_name() == _p+#n) { \
 // Register for parameter changed notifications
 #define PAMA_PARAMS_CHANGED(node_ref, cxt_ref, pre_str, all_params, validate_func, logger_macro) \
 {auto log_func = [&_n = node_ref](const std::string & n, const std::string & v) { \
-    logger_macro(_n.get_logger(), "Parameter %s changed value to %s", n.c_str(), v.c_str());}; \
+    logger_macro(_n.get_logger(), "Parameter %s value changed to %s", n.c_str(), v.c_str());}; \
 cxt_ref.pama_callback_handle_ = node_ref.add_on_set_parameters_callback( \
 [this, log_func](const std::vector<rclcpp::Parameter> &parameters) -> rcl_interfaces::msg::SetParametersResult \
 { \
