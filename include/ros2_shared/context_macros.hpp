@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <rclcpp/node.hpp>
+
 // A set of macros that help define parameters in ROS2 nodes.
 //
 //  1) Define a master macro with containing the full list of parameters.
