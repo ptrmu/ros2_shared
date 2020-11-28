@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <rclcpp/node.hpp>
+
 // A set of macros that help define parameters in ROS2 nodes.
 //
 //  1) Define a master macro with containing the full list of parameters.
@@ -23,6 +25,9 @@
 // Define CXT_MACRO_MEMBER to CXT_MACRO_DEFINE_MEMBER before declaring members
 #define CXT_MACRO_DEFINE_MEMBER(n, t, d) t n##_{d};
 
+#define CXT_MACRO_DEFINE_MEMBERS(all_params) \
+  all_params \
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr cxt_macro_callback_handle_{};
 
 // ==============================================================================
 // Declare parameters
@@ -45,27 +50,21 @@ validate_func(); \
 // Define CXT_MACRO_MEMBER to CXT_MACRO_PARAMETER_CHANGED before invoking CXT_MACRO_REGISTER_PARAMETERS_CHANGED
 // Notice that the_logger and param_set are expected to be defined and initialized
 // in the CXT_MACRO_REGISTER_PARAMETERS_CHANGED macro
-#define CXT_MACRO_PARAMETER_CHANGED(cxt_ref, n, t) \
+#define CXT_MACRO_PARAMETER_CHANGED(n, t) \
 if (parameter.get_name() == #n) {\
   param_set = true; \
-  cxt_ref.n##_ = parameter.get_value<t>(); \
-  RCLCPP_INFO(the_logger, "Parameter %s changed value to %s", #n, \
-  rclcpp::to_string(rclcpp::ParameterValue{cxt_ref.n##_}).c_str()); \
+  _c.n##_ = parameter.get_value<t>(); \
+  RCLCPP_INFO(the_logger, "Parameter %s value changed to %s", #n, \
+  rclcpp::to_string(rclcpp::ParameterValue{_c.n##_}).c_str()); \
 }
 
 // Register for parameter changed notifications
-#define CXT_MACRO_REGISTER_PARAMETERS_CHANGED(node_ref, all_params, validate_func) \
-node_ref.set_on_parameters_set_callback( \
-[this, existing_callback = node_ref.set_on_parameters_set_callback(nullptr), the_logger = node_ref.get_logger()]\
+#define CXT_MACRO_REGISTER_PARAMETERS_CHANGED(node_ref, cxt_ref, all_params, validate_func) \
+cxt_ref.cxt_macro_callback_handle_ = node_ref.add_on_set_parameters_callback( \
+[this, &_c = cxt_ref, the_logger = node_ref.get_logger()]\
 (const std::vector<rclcpp::Parameter> &parameters) -> rcl_interfaces::msg::SetParametersResult\
 {\
   auto result = rcl_interfaces::msg::SetParametersResult(); \
-  if (nullptr != existing_callback) { \
-    result = existing_callback(parameters); \
-    if (!result.successful) { \
-      return result; \
-    } \
-  } \
   bool param_set{false}; \
   for (const auto &parameter : parameters) { \
     all_params \
