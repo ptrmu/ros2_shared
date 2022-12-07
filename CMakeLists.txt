@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 project(ros2_shared)
 
 # Default to C99
@@ -17,11 +17,27 @@ endif()
 
 # Find packages
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
 
-ament_export_include_directories(include)
+# Create a modern CMake target
+add_library(ros2_shared INTERFACE)
+add_library(ros2_shared::ros2_shared ALIAS ros2_shared)
+
+# ros2_shared depends on rclcpp
+target_link_libraries(ros2_shared
+  INTERFACE
+    rclcpp::rclcpp)
+
+# Install
+install(TARGETS ros2_shared
+  EXPORT ros2_shared_targets
+  INCLUDES DESTINATION include)
 
 install(DIRECTORY include/
   DESTINATION include)
 
-ament_package()
+# Export
+ament_export_targets(ros2_shared_targets)
+ament_export_dependencies(rclcpp)
 
+ament_package()
